@@ -1518,6 +1518,7 @@ func set_air_control(control: bool) -> void:
 
 ## Shows the player's invincibility barrier (doesn't impact the player's invincibility)
 func show_invincibility_barrier() -> void:
+	shieldSprite.visible = false # turn off barrier for stars
 	invincibility_barrier.visible = true
 
 

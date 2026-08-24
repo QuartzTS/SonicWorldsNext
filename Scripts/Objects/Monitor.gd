@@ -113,7 +113,6 @@ func destroy():
 		ITEMS.INVINCIBILITY:
 			if !playerTouch.get("isSuper"):
 				playerTouch.supTime = 20
-				playerTouch.shieldSprite.visible = false # turn off barrier for stars
 				playerTouch.show_invincibility_barrier()
 				MusicController.play_music_theme(MusicController.MusicTheme.INVINCIBLE)
 		ITEMS.SHIELD:

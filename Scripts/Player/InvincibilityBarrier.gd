@@ -135,7 +135,7 @@ func _draw() -> void:
 		draw_texture_rect_region(
 			star_spritesheet, # The full spritesheet
 			Rect2( # The position and size in a rect
-				to_local(star_relative_position + star_position_arr[star_pair_num] - Vector2(16, 16)),
+				star_relative_position + to_local(star_position_arr[star_pair_num]) - Vector2(16, 16),
 				Vector2(31, 31)),
 			REGIONS[frame_arr[(star_frame[frame_index] + frame_increment) % frame_arr.size()]] # The drawn region
 		)
