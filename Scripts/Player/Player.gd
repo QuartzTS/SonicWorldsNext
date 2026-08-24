@@ -54,7 +54,6 @@ var ringChannel = 0
 
 var Particle = preload("res://Entities/Misc/GenericParticle.tscn")
 var CountDown = preload("res://Entities/Misc/CountDownTimer.tscn")
-var RotatingParticle = preload("res://Entities/Misc/RotatingParticle.tscn")
 
 # ================
 
@@ -81,6 +80,8 @@ var reflective = false # used for reflecting projectiles
 
 # State array
 @onready var state_list = $States.get_children()
+
+@onready var invincibility_barrier: Node2D = $InvincibilityBarrier
 
 # Animation related
 # XXX This will all be deprecated soon. Use get_avatar() to get at all the sprite/animation stuff instead.
@@ -428,7 +429,7 @@ func _process(delta):
 		if !isSuper:
 			supTime -= delta
 		else:
-			$InvincibilityBarrier.visible = false
+			invincibility_barrier.visible = false
 			# Animate Palette
 			# check if ring count is greater then 0
 			# deactivate if stage cleared
@@ -443,7 +444,7 @@ func _process(delta):
 		if (supTime <= 0):
 			if (_shield != SHIELDS.NONE):
 				shieldSprite.visible = true
-			$InvincibilityBarrier.visible = false
+			invincibility_barrier.visible = false
 			# turn off super palette and physics (if super)
 			if is_instance_valid(superAnimator) and isSuper:
 				isSuper = false
@@ -470,27 +471,6 @@ func _process(delta):
 			visible = true
 	if (ringDisTime > 0) and current_state != STATES.HIT:
 		ringDisTime -= delta
-
-	#Rotating stars
-	if ($InvincibilityBarrier.visible):
-		var stars = $InvincibilityBarrier.get_children()
-		var rot_angle: float = deg_to_rad(360.0*delta*4.0)
-		for i in stars:
-			i.position = i.position.rotated(rot_angle)
-			i.visible = visible
-
-		if (fmod(Global.globalTimer,0.1)+delta > 0.1) and visible:
-			var star = RotatingParticle.instantiate()
-			var starPart = star.get_node("GenericParticle")
-			star.global_position = global_position
-			starPart.getTarget = self
-			starPart.direction = -_direction
-			get_parent().add_child(star)
-			var options = ["StarSingle","StarSinglePat2","default"]
-			starPart.play(options[round(randf()*2)])
-			starPart.frame = randf_range(0,2)
-			starPart.velocity = velocity
-			starPart.position = stars[0].global_position-global_position
 
 	# Animator
 	if current_state != STATES.PEELOUT:
@@ -1410,7 +1390,7 @@ func set_shield(setShieldID: PlayerChar.SHIELDS) -> void:
 	
 	_shield = setShieldID
 	# make shield visible if not super and the invincibility barrier isn't going
-	shieldSprite.visible = !isSuper and !$InvincibilityBarrier.visible
+	shieldSprite.visible = supTime <= 0
 	match (_shield):
 		SHIELDS.NORMAL:
 			shieldSprite.play("Default")
@@ -1534,6 +1514,11 @@ func set_horizontal_lock_timer(lock_time: float) -> void:
 ## Sets whether or not the player currently has air control.
 func set_air_control(control: bool) -> void:
 	self.airControl = control
+
+
+## Shows the player's invincibility barrier (doesn't impact the player's invincibility)
+func show_invincibility_barrier() -> void:
+	invincibility_barrier.visible = true
 
 
 # Player Gimmick Interaction
