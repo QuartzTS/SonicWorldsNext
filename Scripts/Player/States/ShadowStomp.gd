@@ -28,8 +28,7 @@ func state_physics_process(delta: float) -> void:
 
 	# air movement
 	# Stomp attack does not care about x input, x speed is always zero'd.
-	if !parent.is_on_ground():
-		parent.movement.x = 0
+	parent.movement.x = 0
 				
 	# Air drag
 	if (parent.movement.y < 0 and parent.movement.y > -release_jump * 60):
@@ -58,9 +57,21 @@ func state_exit():
 	var shadow_avatar: ShadowAvatar = parent.get_avatar()
 	if parent.ground:
 		parent.movement.y = min(parent.movement.y,0)
-	
-	parent.poleGrabID = null
 	parent.enemyCounter = 0
-	print("resetting stomp animator")
 	shadow_avatar.vfx_animator.play("RESET")
 	lockDir = false
+
+
+# bounce handling
+func bounce():
+	var shadow_avatar: ShadowAvatar = parent.get_avatar()
+	print("enemy bounce")
+	# check if bounce reaction is set
+	if parent.bounceReaction != 0:
+		# set bounce movement
+		parent.movement.y = -parent.bounceReaction*60
+		parent.bounceReaction = 0
+		shadow_avatar.shadow_reset_abilities(null, -1, null, -1)
+		return true
+	# if no bounce then return false to continue with landing routine
+	return false
